@@ -1,0 +1,46 @@
+[
+  {
+    "name": "Mobile Computing", 
+    "tag": "MC"
+  },
+  {
+    "name": "Computer Networks and Communications", 
+    "tag": "CN"
+  },
+  {
+    "name": "Human Computer Interaction", 
+    "tag": "HCI"
+  },
+  {
+    "name": "Machine Learning & Artificial Intelligence", 
+    "tag": "AI"
+  },
+  {
+    "name": "Image Processing & Computer Vision", 
+    "tag": "CV"
+  },
+  {
+    "name": "Security & Privacy", 
+    "tag": "SEC"
+  },
+  {
+    "name": "Database and Data Management", 
+    "tag": "DB"
+  },
+  {
+    "name": "System Architecture", 
+    "tag": "SYS"
+  },
+  {
+    "name": "Software Engineering", 
+    "tag": "SE"
+  },
+  {
+    "name": "Signal Processing", 
+    "tag": "SP"
+  },
+  {
+    "name": "Digital Health & Medical Informatics", 
+    "tag": "BIO"
+  }
+]

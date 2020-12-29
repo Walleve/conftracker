@@ -1,0 +1,393 @@
+{% extends "layout.html" %}
+{% block page_title %}
+<!-- Overlay, must be placed direct after the opening body tag. -->
+<div class="bs-canvas-overlay bs-canvas-anim bg-dark position-fixed w-100 h-100"></div>
+
+    <!-- {{ super() }} -->
+
+		<!-- Banner -->
+		<header class="bg-primary text-white">
+	    <div class="container text-center">
+	      <h1>Welcome to Zeus Simple Conference Subscription Service</h1>
+	      <p class="lead">Zeus DDR: A Deadline-Driven Approach Towards Productive Research:-)</p>
+	    </div>
+	  </header>
+
+{% endblock %}
+{% block body %}
+		<section>
+			<div class="container">
+
+			{% with messages = get_flashed_messages(with_categories=true) %}		  	  	
+				{% if messages %}
+			    {% for category, message in messages %}
+						<div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+						  {{ message }}
+						  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						    <span aria-hidden="true">&times;</span>
+						  </button>
+						</div>
+			    {% endfor %}
+			  {% endif %}
+			{% endwith %}
+
+			<div class="btn-toolbar  justify-content-between mb-3" role="toolbar" aria-label="Toolbar with button groups">
+			  <div class="btn-group" role="group" aria-label="First group">
+			    <select class="form-control mr-2" id="category" >
+	            <option>All Categories (TODO)</option>
+	        </select>
+					<select class="form-control mr-2" id="locations" >
+	            <option>All Countries (TODO)</option>
+	            {% for c in data.countries %}
+	            <option>{{c}}</option>
+	            {% endfor %}
+	        </select>
+			  </div>
+        <!-- <div class="input-group">
+        		<input type="text" name="keywords" id="keywords" class="form-control" value="" placeholder="Search keyword (TODO)" />
+			  </div> -->
+			  <div class="btn-group float-right">
+			  	{% if current_user.is_authenticated %}
+			    <a class="btn btn-primary" data-toggle="canvas" data-target="#bs-canvas-edit" aria-expanded="false" aria-controls="bs-canvas-right" href="#">Add Conference</a>
+			    {% else %}
+			    <a class="btn btn-primary" data-toggle="canvas" data-target="#bs-canvas-sign-up" aria-expanded="false" aria-controls="bs-canvas-right" href="#">Login to Add/Edit</a>
+			  	{% endif %}
+			  </div>
+			</div>
+
+			<div id="confs">
+				{% for conf in data.confs %}
+          <!-- <div id="{{conf.id}}" class="row conf-row {% for cat in conf.cats %} {{cat}} {% endfor %}"> -->
+            <div class="row conf-row shadow p-3 mb-3 bg-white rounded hover-shadow">
+            	<div class="col-xs-1 col-sm-1">
+            		<a class="conf-abbr" href="{{conf.link}}">{% if conf.publisher != None %} {{conf.publisher}} {% endif %} <br/> {{conf.abbr}}</a>
+            	</div>
+            	<div class="col-xs-10 col-sm-10">
+            		<div class="row">
+            			<div class="col-xs-12 col-sm-12">
+            			<a class="conf-title" href="{{conf.link}}">{{conf.title}}</a>
+            			</div>
+            		</div>
+            		<div class="row">
+            			<div class="col-xs-6 col-sm-6">
+            				<div class="conf-details">
+            					<span class="conf-date">{{conf.dates}}, </span>
+            					<span class="conf-location">
+            						{% if conf.city == "Virtual" %}
+		                    <a href="#">{{conf.city}}, {{conf.country}}</a>.
+		                    {% else %}
+		                    <a href="http://maps.google.com/?q={{conf.city}}, {{conf.country}}">{{conf.city}}, {{conf.country}}</a>.
+		                    {% endif %}
+		                  </span>
+            				</div>
+                  </div>
+                  <div class="col-xs-3 col-sm-3">
+            				<span class="conf-dealine">Deadline: {{conf.subdate}}</span>
+                  </div>
+                  <div class="col-xs-3 col-sm-3">
+            				<span class="conf-date">Abstract: {{conf.absdate}}</span>
+                  </div>
+            		</div>
+            		<div class="row">
+            			<div class="col-xs-6 col-sm-6">
+                    {% for cat in conf.category %}
+                    <span title="{{cat_name}}" data-cat="{{cat}}" class="badge badge-warning conf-cat-{{cat}}-tag"> {{ cat }} </span>
+                    {% endfor %}
+                	</div>
+            			<div class="col-xs-3 col-sm-3">                    
+                    <span class="conf-date"> Notification: {{ conf.notifdate }} </span>
+                	</div>
+            			<div class="col-xs-3 col-sm-3">                    
+                    <span class="conf-date"> Camera Ready: {{ conf.crdate }} </span>
+                	</div>
+            		</div>
+              </div>
+            	<div class="col-xs-1 col-sm-1">
+            		<button type="button" class="btn btn-info btn-sm mb-2 btn-star" id="{{conf.id}}" href="">
+								  {% if conf.star == 0 %}
+								  <i class="far fa-star" id="star-{{conf.id}}"></i> 
+								  {% else %}
+								  <i class="fas fa-star" id="star-{{conf.id}}"></i>
+								  {% endif %}
+								  Star
+								</button>
+			  				{% if current_user.is_authenticated %}
+            		<button type="button" class="btn btn-warning btn-sm btn-edit" id="{{conf.id}}" data-toggle="canvas" data-target="#bs-canvas-edit" aria-expanded="false" aria-controls="bs-canvas-right" href="#">
+								  <i class="fas fa-edit"></i> Edit
+								</button>
+								{% endif %}
+            	</div>
+            </div>
+        	<!-- </div> -->
+        {% endfor %}
+        </div>      
+			</div>
+		</section>
+
+  <section id="about" class="bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          <h2>About Zeus DDR</h2>
+          <p class="lead">Finally, this page got a new look (in fact, a new "brain" too)! It even has a name now, Zeus DDR! Back to 2015, the page was first built as a simple online conference tracker only to visualize a conference list in <a href="https://zhouzimu.github.io/">Zimu</a>'s small notebook. Later, quite some people (mostly my friends and colleagues) find it useful as Zimu always keeps the list up to date.</p>
+          <p class="lead">To add more. Stay tuned!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          <h2>Contact us</h2>
+          <p class="lead">Please feel free to drop me an email (find out <a href="https://cswu.me/">here</a>) for any thoughts or feedback.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Off-canvas sidebar markup, left/right or both. -->
+  <div id="bs-canvas-sign-up" class="bs-canvas bs-canvas-anim bs-canvas-right position-fixed bg-light h-100">
+      <header class="bs-canvas-header p-3 bg-primary overflow-auto">
+          <button type="button" class="bs-canvas-close float-left close" aria-label="Close"><span aria-hidden="true" class="text-light">&times;</span></button>
+          <h4 class="d-inline-block text-light mb-0 float-right">Login/Sign Up</h4>
+      </header>
+      <div class="bs-canvas-content px-3 py-5">
+      	<form method="post" action="/login">
+            <div class="form-group">
+                <label for="first-name">First Name</label>                
+                <input type="text" name="first_name" id="first_name" class="form-control" value="" placeholder="First Name" />
+            </div>
+            <div class="form-group">
+                <label for="first-name">Last Name</label>                
+                <input type="text" name="last_name" id="last_name" class="form-control" value="" placeholder="Last Name" />
+            </div>
+            <div class="form-group">
+                <label for="first-name">Email Address</label>                
+                <input type="email" name="email" id="email" class="form-control" value="" placeholder="name@example.com" />
+            </div>
+            <p class="text-center mb-0"><button type="submit" class="btn btn-primary"> Go </button></p>
+            <div class="form-group">
+            		<p></p>
+                <p class="text-muted small">Note: We recommend you use your real name (or a unique name you won't forget) and email since you will be asked for those information for login in the future.</p>
+            </div>
+        </form>
+      </div>
+  </div>
+      
+  <div id="bs-canvas-edit" class="bs-canvas bs-canvas-anim bs-canvas-right position-fixed bg-light h-100" data-width="400px">
+      <header class="bs-canvas-header p-3 bg-primary overflow-auto">
+          <button type="button" class="bs-canvas-close float-left close" aria-label="Close"><span aria-hidden="true" class="text-light">&times;</span></button>
+          <h4 class="d-inline-block text-light mb-0 float-right" id="add-edit-title">Add New Conference</h4>
+      </header>
+      <div class="bs-canvas-content px-3 py-5">
+          <form method="post" action="addedit">
+          	<input type="text" name="id" id="id" class="form-control" value="" placeholder="" hidden />
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">Abbreviation</span>
+			  			</div>
+              <input type="text" name="abbr" id="abbr" class="form-control" value="" placeholder="Short Conference Name" />
+            </div>
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">Publisher</span>
+			  			</div>
+              <select class="form-control" name="publisher" id="publisher" >
+								<option value="" selected disabled>Select Publisher</option>
+		            <option value=""></option>
+		            <option value="ACM">ACM</option>
+		            <option value="IEEE">IEEE</option>
+		            <option value="ACM/IEEE">ACM/IEEE</option>
+		            <option value="USENIX">USENIX</option>
+		            <option value="Springer">Springer</option>
+		            <option value="EAI">EAI</option>
+		            <option value="Elsevier">Elsevier</option>
+		        	</select>            
+            </div>
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">Year</span>
+			  			</div>
+              <input type="text" name="year" id="year" class="form-control" value="" placeholder="Conference year" data-provide="datepicker" data-date-format="yyyy"/>             
+            </div>
+				  	<script type="text/javascript">
+				  		$(function () {
+	                $("#year").datepicker( {
+									    format: "yyyy", // Notice the Extra space at the beginning
+									    viewMode: "years", 
+									    minViewMode: "years",
+									    autoclose: true
+									});
+	            });
+				  	</script>
+				  	<!-- <div class="form-group row">
+              <label for="year" class="col-sm-4 col-form-label">Year</label>
+              <div class="col-sm-8">
+	        		<input type="text" name="year" id="year" class="form-control" value="" placeholder="Year" data-provide="datepicker" data-date-format="yyyy"/>
+	        		</div>
+				  	</div>
+				  	<div class="form-group">
+              <label for="abbr">Full Name</label>  
+			        <input type="text" name="title" id="title" class="form-control" value="" placeholder="Full conference name" />
+						</div> -->
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">Full Name</span>
+			  			</div>
+              <input type="text" name="title" id="title" class="form-control" value="" placeholder="Full Conference Name" />            
+            </div>
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">URL</span>
+			  			</div>
+              <input type="text" name="homepage" id="homepage" class="form-control" value="" placeholder="url to the website" />            
+            </div>
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">City</span>
+			  			</div>
+              <input type="text" name="city" id="city" class="form-control" value="" placeholder="City" />          
+            </div>
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">Country</span>
+			  			</div>
+              <input type="text" name="country" id="country" class="form-control" value="" placeholder="Country" />
+	        	</div>
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">Start Date</span>
+			  			</div>
+              <input type="text" name="startdate" id="startdate" class="form-control date" value="" placeholder="Start date" data-provide="datepicker" data-date-format="yyyy-mm-dd"/>
+	        	</div>
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">End Date</span>
+			  			</div>
+              <input type="text" name="enddate" id="enddate" class="form-control date" value="" placeholder="End date" data-provide="datepicker" data-date-format="yyyy-mm-dd"/>
+	        	</div>
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">Abstract Due</span>
+			  			</div>
+              <input type="text" name="absdate" id="absdate" class="form-control date" value="" placeholder="Abstract deadline" data-provide="datepicker" data-date-format="yyyy-mm-dd"/>
+	        	</div>
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">Submission Due</span>
+			  			</div>
+	        		<input type="text" name="subdate" id="subdate" class="form-control date" value="" placeholder="Submission deadline" data-provide="datepicker" data-date-format="yyyy-mm-dd"/>
+	        	</div>
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">Notification</span>
+			  			</div>
+	        		<input type="text" name="notifdate" id="notifdate" class="form-control date" value="" placeholder="Notification date" data-provide="datepicker" data-date-format="yyyy-mm-dd"/>
+	        	</div>
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">Camera Ready</span>
+			  			</div>
+	        		<input type="text" name="crdate" id="crdate" class="form-control date" value="" placeholder="Camera-ready date" data-provide="datepicker" data-date-format="yyyy-mm-dd"/>
+	        	</div>
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">CCF Rank</span>
+			  			</div>
+              <select class="form-control" name="ccfrank" id="ccfrank" value="">
+								<option value="" selected disabled>CCF Rank</option>
+		            <option value=""></option>
+		            <option value="A">A</option>
+		            <option value="B">B</option>
+		            <option value="C">C</option>
+		        	</select>
+	        	</div>
+            <div class="input-group flex-nowrap mb-3">
+            	<div class="input-group-prepend">
+			    			<span class="input-group-text" id="addon-wrapping">Category</span>
+			  			</div>
+	        		<select multiple class="form-control" name="category" id="category">
+								<option value="" selected disabled>Select category</option>
+								{% for tag, name in data.cates %}
+		            <option value={{tag}}>{{name}}</option>
+		            {% endfor %}
+		        	</select>
+	        	</div>
+				  	<p class="text-muted small">Please check again and make sure all information is correct:)</p>
+						<div class="btn-group" role="group">
+							<input type="submit" id="add-edit" value="Confirm and Submit" class="btn btn-primary" />
+						</div>
+						<p class="text-muted small text-alert" id="addedit-alert"></p>
+            <!-- <p class="text-center mb-0"><button type="submit" class="btn btn-primary"> Go </button></p> -->
+        	</form>    		
+      </div>    
+  </div>
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+ $('.btn-edit').click(function(){
+   var conf = $(this).attr('id');
+   $('#add-edit-title').text('Edit a Conference');
+   // AJAX request
+   $.ajax({
+    url: "{{url_for('edit')}}",
+    type: 'POST',
+    data: {confid: conf},
+    success: function(res){ 
+      // Add response in Modal body
+      if (res['code'] != 0) {
+	      return;
+	    }
+      $('#id').val(res['id']);
+      $('#abbr').val(res['abbr']);
+      $('#publisher').val(res['publisher']);
+      $('#year').val(res['year']);
+      $('#title').val(res['title']);
+      $('#homepage').val(res['link']);
+      $('#city').val(res['city']);
+      $('#country').val(res['country']);
+      $('#startdate').val(res['startdate']);
+      $('#enddate').val(res['enddate']);
+      $('#absdate').val(res['absdate']);
+      $('#subdate').val(res['subdate']);
+      $('#notifdate').val(res['notifdate']);
+      $('#crdate').val(res['crdate']);
+      $('#ccfrank').val(res['ccfrank']);
+      $('#category').val(res['category'].split(','));
+      $('#addedit-alert').text('');
+    }
+  });
+ });
+
+ $('.btn-star').click(function(){
+   var confid = $(this).attr('id');
+   // AJAX request
+   $.ajax({
+    url: "{{url_for('star')}}",
+    type: 'POST',
+    data: {conf: confid},
+    success: function(res){ 
+      // Add response in Modal body
+      if (res['code'] == 0) {
+	      $('#star-'+confid).addClass('far').removeClass('fas');
+	      return;
+	    }
+	    else if (res['code'] == 1) {
+	    	$('#star-'+confid).addClass('fas').removeClass('far');
+	      return;	
+	    }
+	    else {
+	    	$('a#user-login').click();
+	    }
+    }
+  });
+ });
+ 
+});
+</script>
+
+{% endblock %}
+
