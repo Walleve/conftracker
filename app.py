@@ -39,7 +39,8 @@ people_db = '/var/www/ows/people.json'
 #     # return jsonify(data)
 
 def get_categories(ret_type='array'):
-    with open('categories.json', 'r') as f:
+    cat_file = '/var/www/conftracker/categories.json'
+    with open(cat_file, 'r') as f:
         data = json.load(f)
     cates = []
     if ret_type == 'array':
