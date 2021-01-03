@@ -6,6 +6,7 @@ from services import RecordService
 from services import UserService
 import json
 import os.path
+from sys import platform
 import flask_login
 
 # pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
@@ -39,7 +40,10 @@ people_db = '/var/www/ows/people.json'
 #     # return jsonify(data)
 
 def get_categories(ret_type='array'):
-    cat_file = '/var/www/conftracker/categories.json'
+    if 'linux' in platform:
+        cat_file = '/var/www/conftracker/categories.json'
+    else:
+        cat_file = 'categories.json'
     with open(cat_file, 'r') as f:
         data = json.load(f)
     cates = []
@@ -188,12 +192,12 @@ def login():
     if status == 0:
         flask_login.login_user(user)  
         flash("Welcome back,  " + u['first_name'] + "!", 'success')      
-        return redirect(url_for('home'))
+        return redirect(url_for('home', star=1))
     elif status == 2: # new user
-        user = userService.add(u)
+        status, user = userService.add(u)
         flask_login.login_user(user)
         flash("Signed up successfully with email " + u['email'], 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('home', star=1))
     else:
         flash("Login failed: Existing email with incorrect first/last name.", 'danger')
         return redirect(url_for('home'))

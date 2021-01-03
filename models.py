@@ -2,8 +2,12 @@ import sqlite3
 import hashlib
 import datetime
 
-# db = 'db_files/conftracker.db'
-db = '/var/www/conftracker/db_files/conftracker.db'
+from sys import platform
+
+if 'linux' in platform:
+    db = '/var/www/conftracker/db_files/conftracker.db'
+else:
+    db = 'db_files/conftracker.db'
 
 class Schema:
     def __init__(self):
